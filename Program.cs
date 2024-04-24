@@ -134,8 +134,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseRateLimiter();
 
-if (app.Environment.IsDevelopment()) app.Run();
-else app.Run("http://::80");
+app.Run("http://::80");
 
 
 
