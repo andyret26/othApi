@@ -133,7 +133,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.UseRateLimiter();
-app.Run();
+
+if (app.Environment.IsDevelopment()) app.Run();
+else app.Run("http://::80");
+
 
 
 static async Task<SecurityKey[]> FetchJwksAsync(string jwksUri)
