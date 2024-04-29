@@ -139,7 +139,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
         var tournaments = _db.Tournaments
             .Include((t) => t.TeamMates)
             .Where((t) => t.TeamMates!.Any((p) => p.Id == playerId))
-            .OrderBy((t) => t.Date)
+            .OrderByDescending((t) => t.Date)
             .ToList();
         return tournaments;
     }
