@@ -8,6 +8,7 @@ public interface IPlayerService
     List<Player> Get();
     List<Player> GetMinimal();
     Task<Player?> GetByIdAsync(int id);
+    Task<string> GetUsernameWithIdAsync(int id);
     public Task<List<Player>> GetMultipleById(List<int> ids);
     Task<Player> PostAsync(Player player);
     Task AddMultipleAsync(List<Player> players);

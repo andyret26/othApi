@@ -3,20 +3,24 @@ using Microsoft.AspNetCore.RateLimiting;
 using othApi.Data;
 using othApi.Data.Dtos;
 using othApi.Data.Exceptions;
+using othApi.Services.Discord;
 using othApi.Services.OsuApi;
+using othApi.Services.Players;
 using othApi.Utils;
 
 namespace othApi.Controllers;
 
 [Route("api/v1/misc")]
+[Consumes("application/Json")]
+[Produces("application/Json")]
 [EnableRateLimiting("fixed")]
-public class MiscController(IOsuApiService osuApiService) : ControllerBase
+public class MiscController(IOsuApiService osuApiService, IPlayerService playerService, IDiscordService discordService) : ControllerBase
 {
     private readonly IOsuApiService _osuApiService = osuApiService;
+    private readonly IPlayerService _playerService = playerService;
+    private readonly IDiscordService _discordService = discordService;
 
     [HttpPost("compare-matches-v2")]
-    [Consumes("application/Json")]
-    [Produces("application/Json")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<List<Map>>> CompareMatches([FromBody] MiscCompareRequestDto matchInfo)
@@ -46,8 +50,7 @@ public class MiscController(IOsuApiService osuApiService) : ControllerBase
 
 
     [HttpPost("compare-matches-v1")]
-    [Consumes("application/Json")]
-    [Produces("application/Json")]
+
     public async Task<ActionResult<List<MapV1>>> CompareMatchesV1([FromBody] MiscCompareRequestDto matchInfo)
     {
         var games1 = await _osuApiService.GetMatchGamesV1Async(matchInfo.MatchId1);
@@ -64,7 +67,14 @@ public class MiscController(IOsuApiService osuApiService) : ControllerBase
             map.SlimcoverUrl = bm.Beatmapset.Covers.Slimcover;
 
         }
-
         return Ok(maps);
+    }
+
+    [HttpGet("ping")]
+    [ProducesResponseType(200)]
+    public async Task<IActionResult> Ping(){
+        var player = await _playerService.GetUsernameWithIdAsync(3191010);
+        await _discordService.SendMessage($"pinged, {player} ");
+        return Ok();
     }
 }

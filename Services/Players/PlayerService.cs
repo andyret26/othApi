@@ -48,6 +48,15 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             throw;
         };
     }
+    public async Task<string> GetUsernameWithIdAsync(int id)
+    {
+
+        var playerUsername = await _db.Players.Where(p => p.Id == id).Select(p => p.Username).SingleOrDefaultAsync();
+        if (playerUsername == null) throw new NotFoundException("Player", id);
+        return playerUsername;
+
+
+    }
 
     public async Task<List<Player>> GetMultipleById(List<int> ids)
     {
