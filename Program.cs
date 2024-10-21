@@ -58,7 +58,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     // connect to postgres with env
-    options.UseNpgsql(Environment.GetEnvironmentVariable("SUPABASE_CONNECTION"));
+    options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION"));
 });
 
 

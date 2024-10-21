@@ -33,17 +33,17 @@ namespace othApi.Controllers
         private readonly IPlayerService _playerService = playerService;
 
         [HttpGet]
-        public ActionResult<List<TournamentDto>> GetTournaments()
+        public async Task<ActionResult<List<TournamentDto>>> GetTournaments()
         {
-            var tournaments = _tournamentService.Get();
+            var tournaments = await _tournamentService.Get();
             var tournamentDtos = _mapper.Map<List<TournamentDto>>(tournaments);
             return tournamentDtos;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<TournamentDto> GetTournament(int id)
+        public async Task<ActionResult<TournamentDto>> GetTournament(int id)
         {
-            var tournament = _tournamentService.GetById(id);
+            var tournament = await _tournamentService.GetById(id);
             var tournamentDto = _mapper.Map<TournamentDto>(tournament);
             return tournamentDto;
         }
@@ -58,7 +58,7 @@ namespace othApi.Controllers
         {
             try
             {
-                if (_tournamentService.TournamentWithTeamNameExists(tournament.TeamName, tournament.Name))
+                if (await _tournamentService.TournamentWithTeamNameExists(tournament.TeamName, tournament.Name))
                 {
                     return Conflict(new { title = "Conflict", status = "409", detail = "This Tournament already have a team with this Team Name", });
                 }
@@ -85,7 +85,7 @@ namespace othApi.Controllers
                     {
                         return NotFound("One or more players do not exist in the database");
                     }
-                    var resTournament = _tournamentService.AddTeamMates(teamMatesToAdd, addedTournament.Id);
+                    var resTournament = await _tournamentService.AddTeamMates(teamMatesToAdd, addedTournament.Id);
 
                     var tDto = _mapper.Map<TournamentDto>(resTournament);
 
@@ -156,9 +156,12 @@ namespace othApi.Controllers
          * Get Tournaments by player id
          */
         [HttpGet("player/{id}")]
-        public ActionResult<List<TournamentDto>> GetTournamentsByPlayerId(int id)
+        public async Task<ActionResult<List<TournamentDto>>> GetTournamentsByPlayerId(int id)
         {
-            var tournaments = _tournamentService.GetByPlayerId(id);
+                        System.Console.WriteLine("\n\n\n");
+            Console.Write(DateTime.Now.ToString("h:mm:ss.fff tt"));
+            System.Console.WriteLine("\n\n\n");
+            var tournaments = await _tournamentService.GetByPlayerId(id);
             var tournamentDtos = _mapper.Map<List<TournamentDto>>(tournaments);
             return tournamentDtos;
 

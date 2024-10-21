@@ -16,16 +16,16 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
     private readonly DataContext _db = db;
     private readonly IMapper _mapper = mapper;
 
-    public Player? Delete(int id)
+    public Task<Player?> Delete(int id)
     {
         throw new NotImplementedException();
     }
 
-    public List<Player> Get()
+    public async Task<List<Player>> Get()
     {
         try
         {
-            var players = _db.Players.ToList();
+            var players = await _db.Players.ToListAsync();
             return players;
         }
         catch (SqlException err)
@@ -88,7 +88,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
     }
 
-    public Player? Update(Player player)
+    public Task<Player?> Update(Player player)
     {
 
         throw new NotImplementedException();
@@ -119,11 +119,11 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         // }
     }
 
-    public bool Exists(int id)
+    public async Task<bool> Exists(int id)
     {
         try
         {
-            var player = _db.Players.SingleOrDefault((p) => p.Id == id);
+            var player = await _db.Players.SingleOrDefaultAsync((p) => p.Id == id);
             return player != null;
         }
         catch (SqlException err)
@@ -133,16 +133,19 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
     }
 
-    public List<Player> GetMinimal()
+    public async Task<List<Player>> GetMinimal()
     {
         try
         {
-            var players = _db.Players.Select(p => new Player
+            var players = await _db.Players.Select(p => new Player
             {
                 Id = p.Id,
                 Username = p.Username,
 
-            }).ToList();
+            }).ToListAsync();
+            var totalTournaments = await _db.Tournaments.Select(t => new Tournament {
+                Id = t.Id,
+            }).ToListAsync();
             return players;
         }
         catch (SqlException err)
@@ -152,29 +155,30 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
     }
 
-    public PlayerStats GetStats(int id)
+    public async Task<PlayerStats> GetStats(int id)
     {
 
-        var totalTournaments = _db.Players
-            .Where(p => p.Id == id)
-            .Select(p => p.Tournaments!.Count)
-            .FirstOrDefault();
+        var totalTournaments = await _db.Tournaments
+            .Where(t => t.TeamMates.Any(p => p.Id == id))
+            .CountAsync();
 
-        var uniqueTeamMatesCount = _db.Tournaments
+        var uniqueTeamMatesCount = await _db.Tournaments
             .Where(t => t.TeamMates!.Any(p => p.Id == id))
             .SelectMany(t => t.TeamMates!)
             .Select(p => p.Id)
             .Distinct()
-            .ToList().Count;
+            .CountAsync();
 
-        var uniqueFlagCount = _db.Tournaments
+
+        var uniqueFlagCount = await _db.Tournaments
             .Where(t => t.TeamMates!.Any(p => p.Id == id))
             .SelectMany(t => t.TeamMates!)
             .Select(p => p.Country_code)
             .Distinct()
-            .ToList().Count;
+            .CountAsync();
 
-        var wins = _db.Players
+
+        var wins = await _db.Players
             .Where(p => p.Id == id)
             .Select(p => new
             {
@@ -182,17 +186,17 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
                 seconds = p.Tournaments!.Count(t => t.Placement == "2nd"),
                 thirds = p.Tournaments!.Count(t => t.Placement == "3rd")
             })
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
-        var firstRate = wins!.firsts / (decimal)totalTournaments * 100;
-        var top3Rate = (wins!.firsts + wins.seconds + wins.thirds) / (decimal)totalTournaments * 100;
+        // var firstRate = wins!.firsts / (decimal)totalTournaments * 100;
+        // var top3Rate = (wins!.firsts + wins.seconds + wins.thirds) / (decimal)totalTournaments * 100;
 
 
 
-        var allplace = _db.Tournaments
+        var allplace = await _db.Tournaments
             .Where(t => t.TeamMates!.Any(p => p.Id == id))
             .Select(t => ParsePlacement(t.Placement!))
-            .ToList();
+            .ToListAsync();
 
         var avgPlace = Convert.ToDecimal(allplace.Average());
 
@@ -200,11 +204,11 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         {
             AvgPlacement = Math.Round(avgPlace, 1),
             FirstPlaces = wins.firsts,
-            FirstRate = Math.Round(firstRate, 1),
+            // FirstRate = Math.Round(firstRate, 1),
             SecondPlaces = wins.seconds,
             ThirdPlaces = wins.thirds,
-            Top3Rate = Math.Round(top3Rate, 1),
-            TotalTournaments = totalTournaments,
+            // Top3Rate = Math.Round(top3Rate, 1),
+            // TotalTournaments = totalTournaments,
             UniqueFlagCount = uniqueFlagCount,
             UniqueTeamMatesCount = uniqueTeamMatesCount
         };

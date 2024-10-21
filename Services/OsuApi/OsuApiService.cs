@@ -62,7 +62,7 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
         var playerIdsToAdd = new List<int>();
         foreach (int id in ids)
         {
-            if (!_playerService.Exists(id))
+            if (!await _playerService.Exists(id))
             {
                 playerIdsToAdd.Add(id);
             }
@@ -123,7 +123,7 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var respObj = JsonConvert.DeserializeObject<PlayerResponseData>(responseBody)!;
-                if (_playerService.Exists(respObj.Id))
+                if (await _playerService.Exists(respObj.Id))
                 {
                     Console.WriteLine("Player already exists in DB");
                     throw new AlreadyExistException();

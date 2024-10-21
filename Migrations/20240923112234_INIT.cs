@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace othApi.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class INIT : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,6 +19,7 @@ namespace othApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: false),
+                    DiscordTag = table.Column<string>(type: "text", nullable: true),
                     Avatar_url = table.Column<string>(type: "text", nullable: false),
                     Global_rank = table.Column<int>(type: "integer", nullable: false),
                     Country_code = table.Column<string>(type: "text", nullable: false)
@@ -45,11 +46,19 @@ namespace othApi.Migrations
                     Format = table.Column<string>(type: "text", nullable: true),
                     TeamSize = table.Column<string>(type: "text", nullable: true),
                     Placement = table.Column<string>(type: "text", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: true)
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    ImageLink = table.Column<string>(type: "text", nullable: true),
+                    AddedById = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tournaments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tournaments_Players_AddedById",
+                        column: x => x.AddedById,
+                        principalTable: "Players",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,6 +89,11 @@ namespace othApi.Migrations
                 name: "IX_PlayerTournament_TournamentsId",
                 table: "PlayerTournament",
                 column: "TournamentsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tournaments_AddedById",
+                table: "Tournaments",
+                column: "AddedById");
         }
 
         /// <inheritdoc />
@@ -89,10 +103,10 @@ namespace othApi.Migrations
                 name: "PlayerTournament");
 
             migrationBuilder.DropTable(
-                name: "Players");
+                name: "Tournaments");
 
             migrationBuilder.DropTable(
-                name: "Tournaments");
+                name: "Players");
         }
     }
 }

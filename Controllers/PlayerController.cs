@@ -31,11 +31,11 @@ namespace othApi.Controllers
 
         // GET: api/Player
         [HttpGet("min")]
-        public ActionResult<IEnumerable<PlayerMinimalDto>> GetPlayersMinimal()
+        public async Task<ActionResult<IEnumerable<PlayerMinimalDto>>> GetPlayersMinimal()
         {
-            var players = _playerService.GetMinimal();
+
+            var players = await _playerService.GetMinimal();
             var playerDtos = _mapper.Map<IEnumerable<PlayerMinimalDto>>(players);
-            System.Console.WriteLine("Player Min Called");
             return Ok(playerDtos);
         }
 
@@ -63,7 +63,7 @@ namespace othApi.Controllers
 
             await _discordService.SendMessage($"User {useSub.Value} is trying to add player {id}");
 
-            if (_playerService.Exists(id))
+            if (await _playerService.Exists(id))
             {
                 return Conflict($"Player with id {id} already exists");
             }
@@ -114,16 +114,18 @@ namespace othApi.Controllers
         }
 
         [HttpGet("exists/{id}")]
-        public ActionResult<bool> Exists(int id)
+        public async Task<ActionResult<bool>> Exists(int id)
         {
-            return _playerService.Exists(id);
+            return await _playerService.Exists(id);
         }
 
         [HttpGet("stats/{id}")]
-        public ActionResult PlayerStats(int id)
+        public async Task<ActionResult> PlayerStats(int id)
         {
-            if (!_playerService.Exists(id)) return NotFound($"Player with id {id} not found");
-            var playerStats = _playerService.GetStats(id);
+            System.Console.WriteLine(DateTime.Now.ToString());
+            if (!await _playerService.Exists(id)) return NotFound($"Player with id {id} not found");
+            var playerStats = await _playerService.GetStats(id);
+            System.Console.WriteLine(DateTime.Now.ToString());
             return Ok(playerStats);
         }
 

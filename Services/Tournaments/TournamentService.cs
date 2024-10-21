@@ -15,18 +15,18 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
     private readonly IMapper _mapper = mapper;
     private readonly IOsuApiService _osuApiService = osuApiService;
 
-    public Tournament? Delete(int id)
+    public async Task<Tournament?> Delete(int id)
     {
-        _db.Tournaments.Where((t) => t.Id == id).ExecuteDelete();
-        _db.SaveChanges();
+        await _db.Tournaments.Where((t) => t.Id == id).ExecuteDeleteAsync();
+        await _db.SaveChangesAsync();
         return null;
     }
 
-    public List<Tournament> Get()
+    public async Task<List<Tournament>> Get()
     {
         try
         {
-            var tournaments = _db.Tournaments.Include((t) => t.TeamMates).ToList();
+            var tournaments = await _db.Tournaments.Include((t) => t.TeamMates).ToListAsync();
             return tournaments;
         }
         catch (SqlException err)
@@ -36,11 +36,11 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
         }
     }
 
-    public Tournament? GetById(int id)
+    public async Task<Tournament?> GetById(int id)
     {
         try
         {
-            var tournament = _db.Tournaments.Include(t => t.TeamMates).SingleOrDefault((t) => t.Id == id);
+            var tournament = await _db.Tournaments.Include(t => t.TeamMates).SingleOrDefaultAsync((t) => t.Id == id);
             return tournament;
         }
         catch (SqlException err)
@@ -97,7 +97,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
             }
             else
             {
-                if (TournamentWithTeamNameExists(tournament.TeamName, tournament.Name))
+                if (await TournamentWithTeamNameExists(tournament.TeamName, tournament.Name))
                 {
                     throw new ConflitctException();
                 }
@@ -119,13 +119,13 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
 
     }
 
-    public Tournament? AddTeamMates(List<Player> TeamMates, int tourneyId)
+    public async Task<Tournament?> AddTeamMates(List<Player> TeamMates, int tourneyId)
     {
-        var tournament = _db.Tournaments.SingleOrDefault((t) => t.Id == tourneyId);
+        var tournament = await _db.Tournaments.SingleOrDefaultAsync((t) => t.Id == tourneyId);
         if (tournament != null)
         {
             tournament.TeamMates = TeamMates;
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return tournament;
         }
         else
@@ -134,20 +134,20 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
         }
     }
 
-    public List<Tournament> GetByPlayerId(int playerId)
+    public async Task<List<Tournament>> GetByPlayerId(int playerId)
     {
-        var tournaments = _db.Tournaments
+        var tournaments = await _db.Tournaments
             .Include((t) => t.TeamMates)
             .Where((t) => t.TeamMates!.Any((p) => p.Id == playerId))
             .OrderByDescending((t) => t.Date)
-            .ToList();
+            .ToListAsync();
         return tournaments;
     }
 
-    public bool TournamentWithTeamNameExists(string? teamName, string tournamentName)
+    public async Task<bool> TournamentWithTeamNameExists(string? teamName, string tournamentName)
     {
         if (teamName == null || teamName.Length <= 0) return false;
-        var tournament = _db.Tournaments.SingleOrDefault((t) => t.TeamName == teamName && t.Name == tournamentName);
+        var tournament = await _db.Tournaments.SingleOrDefaultAsync((t) => t.TeamName == teamName && t.Name == tournamentName);
         if (tournament != null)
         {
             return true;
