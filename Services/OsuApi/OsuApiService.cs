@@ -244,8 +244,9 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
             if (response.IsSuccessStatusCode)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
+                var games = JsonConvert.DeserializeObject<MatchResponseObjV1>(responseBody)!.Games.GroupBy(g => g.Beatmap_id).Select(group => group.Last()).ToList();
 
-                return JsonConvert.DeserializeObject<MatchResponseObjV1>(responseBody)!.Games.ToList();
+                return games;
 
             }
             else
