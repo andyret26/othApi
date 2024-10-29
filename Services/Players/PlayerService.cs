@@ -159,7 +159,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
     {
 
         var totalTournaments = await _db.Tournaments
-            .Where(t => t.TeamMates.Any(p => p.Id == id))
+            .Where(t => t.TeamMates!.Any(p => p.Id == id))
             .CountAsync();
 
         var uniqueTeamMatesCount = await _db.Tournaments
@@ -188,8 +188,8 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             })
             .FirstOrDefaultAsync();
 
-        // var firstRate = wins!.firsts / (decimal)totalTournaments * 100;
-        // var top3Rate = (wins!.firsts + wins.seconds + wins.thirds) / (decimal)totalTournaments * 100;
+        var firstRate = wins!.firsts / (decimal)totalTournaments * 100;
+        var top3Rate = (wins!.firsts + wins.seconds + wins.thirds) / (decimal)totalTournaments * 100;
 
 
 
@@ -204,11 +204,11 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         {
             AvgPlacement = Math.Round(avgPlace, 1),
             FirstPlaces = wins.firsts,
-            // FirstRate = Math.Round(firstRate, 1),
+            FirstRate = Math.Round(firstRate, 1),
             SecondPlaces = wins.seconds,
             ThirdPlaces = wins.thirds,
-            // Top3Rate = Math.Round(top3Rate, 1),
-            // TotalTournaments = totalTournaments,
+            Top3Rate = Math.Round(top3Rate, 1),
+            TotalTournaments = totalTournaments,
             UniqueFlagCount = uniqueFlagCount,
             UniqueTeamMatesCount = uniqueTeamMatesCount
         };
