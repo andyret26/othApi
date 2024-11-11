@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using othApi.Services.Discord;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
-using othApi.Middleware;
 
 
 DotEnv.Load();
@@ -36,17 +35,15 @@ builder.Services.AddSingleton(new DiscordSocketClient());
 builder.Services.AddCors();
 
 
-
-// Add logging to the services
-builder.Logging.AddSerilog();
-
 // Configure Serilog to log to a file
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Warning()
-    .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day) // Log to a file, with daily rolling logs
+    .WriteTo.File("home/logs/myapplogs.txt", rollingInterval: RollingInterval.Day) // Log to a file, with daily rolling logs
 
     .CreateLogger();
 
+// Add logging to the services
+builder.Logging.AddSerilog();
 
 
 var test = await FetchJwksAsync(Environment.GetEnvironmentVariable("JWKS_URI")!);
@@ -134,29 +131,24 @@ var discordClient = app.Services.GetService<DiscordSocketClient>();
 discordClient!.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN")).GetAwaiter().GetResult();
 discordClient.StartAsync().GetAwaiter().GetResult();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseExceptionHandler(e => 
+{
+    e.Run(async context => {
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "text/plain";
 
+                var exceptionHandlerPathFeature =
+                    context.Features.Get<IExceptionHandlerPathFeature>();
 
+                if (exceptionHandlerPathFeature != null)
+                {
+                    var exception = exceptionHandlerPathFeature.Error;
+                }
 
-
-// app.UseExceptionHandler(e => 
-// {
-//     e.Run(async context => {
-//                 context.Response.StatusCode = 500;
-//                 context.Response.ContentType = "text/plain";
-
-//                 var exceptionHandlerPathFeature =
-//                     context.Features.Get<IExceptionHandlerPathFeature>();
-
-//                 if (exceptionHandlerPathFeature != null)
-//                 {
-//                     var exception = exceptionHandlerPathFeature.Error;
-//                 }
-
-//                 await context.Response.WriteAsync("An error occurred. Please try again later.");
-//     });
-// });
+                await context.Response.WriteAsync("An error occurred. Please try again later.");
+    });
+});
 app.UseCors(builder =>
     {
         builder.WithOrigins("http://localhost:5173", "https://osu-th.vercel.app", "http://localhost:5174", "https://osu-tm.vercel.app", "https://ot-timer.azurewebsites.net") // Replace with the allowed origin(s)
