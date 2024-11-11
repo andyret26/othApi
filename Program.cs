@@ -38,8 +38,8 @@ builder.Services.AddCors();
 // Configure Serilog to log to a file
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Warning()
-    .WriteTo.File("home/logs/myapplogs.txt", rollingInterval: RollingInterval.Day) // Log to a file, with daily rolling logs
-
+    .WriteTo.Console()
+    .WriteTo.File(@"D:\home\LogFiles\myapp-.log", rollingInterval: RollingInterval.Day) // Log to a file, with daily rolling logs
     .CreateLogger();
 
 // Add logging to the services
@@ -131,24 +131,6 @@ var discordClient = app.Services.GetService<DiscordSocketClient>();
 discordClient!.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN")).GetAwaiter().GetResult();
 discordClient.StartAsync().GetAwaiter().GetResult();
 
-
-app.UseExceptionHandler(e => 
-{
-    e.Run(async context => {
-                context.Response.StatusCode = 500;
-                context.Response.ContentType = "text/plain";
-
-                var exceptionHandlerPathFeature =
-                    context.Features.Get<IExceptionHandlerPathFeature>();
-
-                if (exceptionHandlerPathFeature != null)
-                {
-                    var exception = exceptionHandlerPathFeature.Error;
-                }
-
-                await context.Response.WriteAsync("An error occurred. Please try again later.");
-    });
-});
 app.UseCors(builder =>
     {
         builder.WithOrigins("http://localhost:5173", "https://osu-th.vercel.app", "http://localhost:5174", "https://osu-tm.vercel.app", "https://ot-timer.azurewebsites.net") // Replace with the allowed origin(s)
