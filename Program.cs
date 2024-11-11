@@ -12,8 +12,6 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.RateLimiting;
 using othApi.Services.Discord;
-using Microsoft.AspNetCore.Diagnostics;
-using Serilog;
 
 
 DotEnv.Load();
@@ -35,15 +33,8 @@ builder.Services.AddSingleton(new DiscordSocketClient());
 builder.Services.AddCors();
 
 
-// Configure Serilog to log to a file
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Warning()
-    .WriteTo.Console()
-    .WriteTo.File(@"D:\home\LogFiles\myapp-.log", rollingInterval: RollingInterval.Day) // Log to a file, with daily rolling logs
-    .CreateLogger();
 
 // Add logging to the services
-builder.Logging.AddSerilog();
 
 
 var test = await FetchJwksAsync(Environment.GetEnvironmentVariable("JWKS_URI")!);
@@ -80,7 +71,6 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

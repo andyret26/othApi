@@ -53,7 +53,7 @@ public class MiscController(IOsuApiService osuApiService, IPlayerService playerS
 
     public async Task<ActionResult<List<MapV1>>> CompareMatchesV1([FromBody] MiscCompareRequestDto matchInfo)
     {
-        // if (matchInfo == null) return BadRequest(new ErrorResponse("BadRequest", 400, "Match info == null"));
+        if (matchInfo == null) return BadRequest(new ErrorResponse("BadRequest", 400, "Match info == null"));
         var games1 = await _osuApiService.GetMatchGamesV1Async(matchInfo.MatchId1);
         var games2 = await _osuApiService.GetMatchGamesV1Async(matchInfo.MatchId2);
         var maps = GamesToMapCompare.CompareV1(games1, games2, matchInfo);
