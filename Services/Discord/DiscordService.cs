@@ -19,8 +19,9 @@ namespace othApi.Services.Discord
                 await channel.SendMessageAsync(message);
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                System.Console.WriteLine(e.ToString());
                 Console.WriteLine("Error Notifying");
                 return;
             }
