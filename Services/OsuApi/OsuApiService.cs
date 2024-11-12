@@ -1,5 +1,6 @@
 
 using System.Net;
+using System.Runtime.Intrinsics.X86;
 using AutoMapper;
 using Newtonsoft.Json;
 using othApi.Data;
@@ -171,6 +172,12 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
                     var sStriped = s.TrimEnd("/[".ToCharArray());
                     if (sStriped.Contains("https"))
                     {
+                        if (sStriped.Contains("url=")) continue;
+                        if (sStriped.Contains("drive.google.com")) {
+                            var id = sStriped.Split("id=")[1];
+                            stringsWithImg.Add($"https://drive.google.com/thumbnail?id={id}");
+                        }
+
                         if (!(sStriped.Contains(".png") || sStriped.Contains(".jpg") || sStriped.Contains(".jpeg")))
                         {
                             sStriped += ".png";
@@ -179,6 +186,7 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
                         if (!sStriped.Contains("osuflags"))
                         {
                             stringsWithImg.Add(sStriped);
+                            break;
                         }
                     }
 
