@@ -1,4 +1,3 @@
-using System.Data.SqlClient;
 using System.IO.Compression;
 using System.Reflection;
 using AutoMapper;
@@ -28,7 +27,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             var players = await _db.Players.ToListAsync();
             return players;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -42,7 +41,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             var player = await _db.Players.Include(p => p.Tournaments).SingleOrDefaultAsync((p) => p.Id == id);
             return player;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -65,7 +64,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             var players = await _db.Players.Where((p) => ids.Contains(p.Id)).ToListAsync();
             return players;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -81,7 +80,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
 
             return addedPlayer.Entity;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -112,7 +111,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         //     }
 
         // }
-        // catch (SqlException err)
+        // catch (Exceptions err)
         // {
         //     Console.WriteLine(err.Message);
         //     throw;
@@ -126,7 +125,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             var player = await _db.Players.SingleOrDefaultAsync((p) => p.Id == id);
             return player != null;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -148,7 +147,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
             }).ToListAsync();
             return players;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;

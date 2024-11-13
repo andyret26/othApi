@@ -1,4 +1,3 @@
-using System.Data.SqlClient;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +28,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
             var tournaments = await _db.Tournaments.Include((t) => t.TeamMates).ToListAsync();
             return tournaments;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -43,7 +42,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
             var tournament = await _db.Tournaments.Include(t => t.TeamMates).SingleOrDefaultAsync((t) => t.Id == id);
             return tournament;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -54,7 +53,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
     {
         try
         {
-            if (!tournament.ForumPostLink.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(tournament.ForumPostLink))
             {
                 var img = await _osuApiService.GetForumPostCover(tournament.ForumPostLink!.Split("/")[6]);
                 tournament.ImageLink = img;
@@ -65,7 +64,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
 
             return addedTournament.Entity;
         }
-        catch (SqlException err)
+        catch (Exception err)
         {
             Console.WriteLine(err.Message);
             throw;
@@ -81,7 +80,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
 
         if (tournamentToUpdate != null)
         {
-            if (!tournament.ForumPostLink.IsNullOrEmpty() && tournament.ForumPostLink != tournamentToUpdate.ForumPostLink)
+            if (!string.IsNullOrEmpty(tournament.ForumPostLink) && tournament.ForumPostLink != tournamentToUpdate.ForumPostLink)
             {
                 var img = await _osuApiService.GetForumPostCover(tournament.ForumPostLink!.Split("/")[6]);
                 tournament.ImageLink = img;
