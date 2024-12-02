@@ -143,12 +143,6 @@ namespace othApi.Controllers
             {
                 return Unauthorized(new { message = "Faild to authorize Update" });
             }
-            catch (Exception err)
-            {
-                Console.WriteLine(err);
-                throw;
-            }
-
             return NoContent();
         }
 
@@ -158,42 +152,10 @@ namespace othApi.Controllers
         [HttpGet("player/{id}")]
         public async Task<ActionResult<List<TournamentDto>>> GetTournamentsByPlayerId(int id)
         {
-                        System.Console.WriteLine("\n\n\n");
-            Console.Write(DateTime.Now.ToString("h:mm:ss.fff tt"));
-            System.Console.WriteLine("\n\n\n");
             var tournaments = await _tournamentService.GetByPlayerId(id);
             var tournamentDtos = _mapper.Map<List<TournamentDto>>(tournaments);
             return tournamentDtos;
 
         }
-
-        // [HttpGet("update_tournament_to_include_img")]
-        // public async Task<ActionResult> UpdateTournamentToIncludeImg()
-        // {
-        //     var tournaments = _tournamentService.Get();
-        //     foreach (var t in tournaments)
-        //     {
-        //         if (!t.ForumPostLink.IsNullOrEmpty() && t.ImageLink == null)
-        //         {
-        //             System.Console.WriteLine("\n\n ######### \n\n");
-        //             System.Console.WriteLine(t.Name);
-        //             System.Console.WriteLine("\n\n ######### \n\n");
-        //             var mateIds = new List<int>();
-        //             foreach (var mate in t.TeamMates!)
-        //             {
-        //                 mateIds.Add(mate.Id);
-        //             }
-        //             System.Console.WriteLine(t.ForumPostLink);
-        //             var i = await _osuApiService.GetForumPostCover(t.ForumPostLink.Split("/")[6]);
-        //             t.ImageLink = i;
-        //             await _tournamentService.UpdateAsync(t);
-        //             await _tournamentService.UpdateTeamMatesAsync(t.Id, mateIds.ToArray());
-        //             mateIds.Clear();
-        //         }
-        //     }
-
-        //     return Ok();
-        // }
-
     }
 }

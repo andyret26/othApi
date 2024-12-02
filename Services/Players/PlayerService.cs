@@ -1,10 +1,6 @@
-using System.IO.Compression;
-using System.Reflection;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using othApi.Data;
-using othApi.Data.Dtos;
 using othApi.Data.Entities;
 using othApi.Data.Exceptions;
 
@@ -29,8 +25,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            throw new Exception(err.ToString());
         }
     }
 
@@ -43,8 +38,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            throw new Exception(err.ToString());
         };
     }
     public async Task<string> GetUsernameWithIdAsync(int id)
@@ -66,8 +60,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            throw new Exception(err.ToString());
         };
     }
 
@@ -82,8 +75,8 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            
+            throw new Exception(err.ToString());
         }
     }
 
@@ -113,8 +106,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         // }
         // catch (Exceptions err)
         // {
-        //     Console.WriteLine(err.Message);
-        //     throw;
+        //     throw new Exception(err.ToString());
         // }
     }
 
@@ -127,8 +119,8 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            
+            throw new Exception(err.ToString());
         }
     }
 
@@ -149,8 +141,8 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            
+            throw new Exception(err.ToString());
         }
     }
 

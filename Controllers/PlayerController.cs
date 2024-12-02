@@ -122,10 +122,8 @@ namespace othApi.Controllers
         [HttpGet("stats/{id}")]
         public async Task<ActionResult> PlayerStats(int id)
         {
-            System.Console.WriteLine(DateTime.Now.ToString());
             if (!await _playerService.Exists(id)) return NotFound($"Player with id {id} not found");
             var playerStats = await _playerService.GetStats(id);
-            System.Console.WriteLine(DateTime.Now.ToString());
             return Ok(playerStats);
         }
 

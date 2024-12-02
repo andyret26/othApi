@@ -21,9 +21,7 @@ namespace othApi.Services.Discord
             }
             catch (Exception e)
             {
-                System.Console.WriteLine(e.ToString());
-                Console.WriteLine("Error Notifying");
-                return;
+                throw new Exception(e.ToString());
             }
             return;
         }

@@ -71,7 +71,6 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
 
         if (playerIdsToAdd.Count == 0)
         {
-            Console.WriteLine("All players already exist in DB");
             return null;
         }
         // DO Request
@@ -126,7 +125,6 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
                 var respObj = JsonConvert.DeserializeObject<PlayerResponseData>(responseBody)!;
                 if (await _playerService.Exists(respObj.Id))
                 {
-                    Console.WriteLine("Player already exists in DB");
                     throw new AlreadyExistException();
                 }
                 else
@@ -134,7 +132,6 @@ class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiServi
                     var players = await GetPlayers(new List<int> { respObj.Id });
                     if (players == null)
                     {
-                        Console.WriteLine("Player not found");
                         throw new NotFoundException();
                     }
                     return players[0];

@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using othApi.Data;
 using othApi.Data.Entities;
 using othApi.Data.Exceptions;
@@ -30,8 +29,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            throw new Exception(err.ToString());
         }
     }
 
@@ -44,8 +42,8 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+
+            throw new Exception(err.ToString());
         };
     }
 
@@ -66,8 +64,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
         }
         catch (Exception err)
         {
-            Console.WriteLine(err.Message);
-            throw;
+            throw new Exception(err.ToString());
         }
 
     }
