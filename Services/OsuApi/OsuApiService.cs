@@ -7,19 +7,21 @@ using othApi.Data;
 using othApi.Data.Entities;
 using othApi.Data.Exceptions;
 using othApi.Services.Players;
+using Microsoft.Extensions.Configuration;
 
 namespace othApi.Services.OsuApi;
 
-class OsuApiService(IMapper mapper, IPlayerService playerService) : IOsuApiService
+class OsuApiService(IMapper mapper, IPlayerService playerService, IConfiguration config) : IOsuApiService
 {
     private readonly IMapper _mapper = mapper;
     private readonly IPlayerService _playerService = playerService;
+    private readonly IConfiguration _config = config;
 
     public async Task<string> GetToken()
     {
         string apiUrl = "https://osu.ppy.sh/oauth/token";
-        string clientId = Environment.GetEnvironmentVariable("OSU_CLIENT_ID")!;
-        string clientSecret = Environment.GetEnvironmentVariable("OSU_CLIENT_SECRET")!;
+        string clientId = _config["OSU_CLIENT_ID"]!;
+        string clientSecret = _config["OSU_CLIENT_SECRET"]!;
         string grantType = "client_credentials";
         string scope = "public";
 
