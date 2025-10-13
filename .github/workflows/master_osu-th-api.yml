@@ -31,18 +31,18 @@ jobs:
           tags: index.docker.io/andy26/oth-api:${{ github.sha }}
           file: ./Dockerfile
 
-deploy:
-  runs-on: ubuntu-latest
-  needs: build
-  environment:
-    name: 'Production'
-    url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-  steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'osu-th-api'
-        slot-name: 'Production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_5e4f9d9d960940ad9d13fe467b006d11 }}
-        images: 'index.docker.io/andy26/oth-api:${{ github.sha }}'
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'osu-th-api'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_5e4f9d9d960940ad9d13fe467b006d11 }}
+          images: 'index.docker.io/andy26/oth-api:${{ github.sha }}'
