@@ -20,8 +20,8 @@ class OsuApiService(IMapper mapper, IPlayerService playerService, IConfiguration
     public async Task<string> GetToken()
     {
         string apiUrl = "https://osu.ppy.sh/oauth/token";
-        string clientId = Environment.GetEnvironmentVariable("OSU_CLIENT_ID")!;
-        string clientSecret = Environment.GetEnvironmentVariable("OSU_CLIENT_SECRET")!;
+        string clientId = _config["OSU_CLIENT_ID"]!;
+        string clientSecret = _config["OSU_CLIENT_SECRET"]!;
         string grantType = "client_credentials";
         string scope = "public";
 

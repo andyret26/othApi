@@ -11,9 +11,8 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.RateLimiting;
 using othApi.Services.Discord;
-using dotenv.net;
 
-DotEnv.Config();
+
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -35,8 +34,8 @@ builder.Services.AddCors();
 
 // Add logging to the services
 
-Console.WriteLine(Environment.GetEnvironmentVariable("JWKS_URI"));
-var test = await FetchJwksAsync(Environment.GetEnvironmentVariable("JWKS_URI")!);
+
+var test = await FetchJwksAsync(config["JWKS_URI"]!);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -65,7 +64,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     // connect to postgres with env
-    options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION"));
+    options.UseNpgsql(config["DB_CONNECTION"]);
 });
 
 
@@ -105,7 +104,7 @@ builder.Services.AddSwaggerGen(c =>
 // Add AutoMapper service
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.LicenseKey = Environment.GetEnvironmentVariable("AUTOMAPPER_LICENCE_KEY");
+    cfg.LicenseKey = config["AUTOMAPPER_LICENCE_KEY"];
 },AppDomain.CurrentDomain.GetAssemblies());
 
 // Add rateLimiter
@@ -120,7 +119,7 @@ builder.Services.AddRateLimiter(_ => _
 // ####### APP ##############################################################################################
 var app = builder.Build();
 var discordClient = app.Services.GetService<DiscordSocketClient>();
-discordClient!.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN")).GetAwaiter().GetResult();
+discordClient!.LoginAsync(TokenType.Bot, config["DISCORD_BOT_TOKEN"]).GetAwaiter().GetResult();
 discordClient.StartAsync().GetAwaiter().GetResult();
 
 app.UseCors(builder =>

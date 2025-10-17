@@ -75,7 +75,7 @@ public class MiscController(IOsuApiService osuApiService, IPlayerService playerS
     [ProducesResponseType(200)]
     public async Task<IActionResult> Ping(){
         var player = await _playerService.GetUsernameWithIdAsync(3191010);
-        return Ok();
+        return Ok("Pong");
     }
 
     [HttpGet("ping-discord")]
