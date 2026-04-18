@@ -127,7 +127,21 @@ namespace othApi.Controllers
             return Ok(playerStats);
         }
 
+        [HttpPatch("updateUsers")]
+        [Authorize]
+        public async Task<ActionResult<string>> UpdateUsers(List<int> playerIds)
+        {
+            var useSub = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (useSub == null) return Unauthorized("Bad Token");
+            if(playerIds.Count > 5) return BadRequest("Can't update this many players, please lower number and try again");
 
+            var updatedPlayers = await _osuApiService.GetPlayers2(playerIds);
+            if (updatedPlayers == null || updatedPlayers.Length <= 0 ) return Ok("No players found to update");
+            var updatedCount = await _playerService.UpdatePlayersWithNewInfoFromOsuApi(updatedPlayers);
+
+
+            return Ok($"{updatedCount} Players updated.");
+        }
 
     }
 }

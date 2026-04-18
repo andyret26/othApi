@@ -18,4 +18,9 @@ public interface IPlayerService
     Task<PlayerStats> GetStats(int id);
     Task UpdateDiscordUsername(int id, string newDiscordUsername);
 
+    Task<List<int>> GetAllPlayerIds();
+
+    // Returns the number of players that were updated
+    Task<int> UpdatePlayersWithNewInfoFromOsuApi(Player[] osuUpdatedUserInfo);
+
 }

@@ -235,4 +235,65 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         player.DiscordTag = newDiscordUsername;
         await _db.SaveChangesAsync();
     }
+
+    public Task<List<int>> GetAllPlayerIds()
+    {
+        return _db.Players.Select(p => p.Id).ToListAsync();
+    }
+
+    public async Task<int> UpdatePlayersWithNewInfoFromOsuApi(Player[] osuUpdatedUserInfo)
+    {
+
+        var osuLookup = osuUpdatedUserInfo.ToDictionary(p => p.Id);
+
+        var ids = osuLookup.Keys.ToList();
+
+        var playersFromDb = await _db.Players
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
+foreach (var p in playersFromDb)
+{
+    Console.WriteLine($"DB BEFORE: {p.Id} {p.Username} {p.Global_rank}");
+}
+        var count = 0;
+        foreach (var oldInfoPlayer in playersFromDb)
+        {
+            var changed = false;
+            var newInfoPlayer = osuLookup[oldInfoPlayer.Id];
+
+            Console.WriteLine($"\n\n\n\n three thing here {newInfoPlayer.Username} {newInfoPlayer.Global_rank}\n\n\n\n");
+            Console.WriteLine($"\n\n\n\n three thing here {oldInfoPlayer.Username} {oldInfoPlayer.Global_rank}\n\n\n\n");
+
+            if(oldInfoPlayer.Username != newInfoPlayer.Username)
+            {
+                oldInfoPlayer.Username = newInfoPlayer.Username;
+                changed = true;
+            }
+            
+            if(oldInfoPlayer.Avatar_url != newInfoPlayer.Avatar_url)
+            {
+                oldInfoPlayer.Avatar_url = newInfoPlayer.Avatar_url;
+                changed = true;
+            }
+
+            if(oldInfoPlayer.Country_code != newInfoPlayer.Country_code)
+            {
+                oldInfoPlayer.Country_code = newInfoPlayer.Country_code;
+                changed = true;
+            }
+
+            if(oldInfoPlayer.Global_rank != newInfoPlayer.Global_rank)
+            {
+                oldInfoPlayer.Global_rank = newInfoPlayer.Global_rank;
+                changed = true;
+            }
+
+            if(changed) count++;
+        }
+
+        await _db.SaveChangesAsync();
+
+
+        return count;
+    }
 }

@@ -300,6 +300,47 @@ class OsuApiService(IMapper mapper, IPlayerService playerService, IConfiguration
 
     }
 
+// Get players, nothing else like the other one that does some crazy stuff with adding and checking if they exist, just a simple request to get players by id, if they dont exist return null
+    public async Task<Player[]?> GetPlayers2(List<int> ids)
+    {
+        string bearerToken = await GetToken();
+
+        // DO Request
+
+        var baseUrl = new Uri("https://osu.ppy.sh/api/v2/users");
+
+        var queryParams = new List<KeyValuePair<string, string>>();
+
+        foreach (int id in ids)
+        {
+            queryParams.Add(new KeyValuePair<string, string>("ids[]", id.ToString()));
+        }
+
+        var queryString = string.Join("&", queryParams.Select(kvp => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
+
+        var fullUrl = new Uri($"{baseUrl}?{queryString}");
+
+        using (HttpClient client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {bearerToken}");
+
+            HttpResponseMessage response = await client.GetAsync(fullUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var respObj = JsonConvert.DeserializeObject<ManyPlayersResponseData>(responseBody)!;
+                var players = _mapper.Map<Player[]>(respObj.Users);
+                return players;
+            }
+            else
+            {
+                throw new Exception($"Request failed with status code {response.StatusCode}");
+            }
+        }
+    }
+
 
     public class TokenResponse
     {
