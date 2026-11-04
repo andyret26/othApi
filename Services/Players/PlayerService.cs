@@ -211,7 +211,7 @@ public class PlayerService(DataContext db, IMapper mapper) : IPlayerService
         {
             return int.Parse(placement[..1]);
         }
-        else if (placement != "Did Not Qualify")
+        else if (placement.Split(" ")[0] == "Top")
         {
             return int.Parse(placement.Split(" ")[1]);
         }
