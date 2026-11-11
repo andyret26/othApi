@@ -29,7 +29,7 @@ namespace othApi.Controllers
         private readonly IOsuApiService _osuApiService = osuApiService;
         private readonly IDiscordService _discordService = discordService;
 
-        // GET: api/Player
+        // GET: api/player
         [HttpGet("min")]
         public async Task<ActionResult<IEnumerable<PlayerMinimalDto>>> GetPlayersMinimal()
         {
@@ -39,7 +39,7 @@ namespace othApi.Controllers
             return Ok(playerDtos);
         }
 
-        // GET: api/Player/5
+        // GET: api/player/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayerDto>> GetPlayer(int id)
         {
@@ -49,7 +49,7 @@ namespace othApi.Controllers
         }
 
 
-        // POST: api/Player
+        // POST: api/player
         [HttpPost("{id}")]
         [ProducesResponseType(201, Type = typeof(PlayerDto))]
         [ProducesResponseType(401)]
@@ -81,7 +81,7 @@ namespace othApi.Controllers
             return CreatedAtAction("GetPlayer", new { id = playerDto.Id }, playerDto);
         }
 
-        [HttpPost("postByUsername/{username}")]
+        [HttpPost("post-by-username/{username}")]
         [Authorize]
         [ProducesResponseType(201, Type = typeof(PlayerDto))]
         [ProducesResponseType(401)]
@@ -127,7 +127,7 @@ namespace othApi.Controllers
             return Ok(playerStats);
         }
 
-        [HttpPatch("updateUsers")]
+        [HttpPatch("update-users")]
         [Authorize]
         public async Task<ActionResult<string>> UpdateUsers(List<int> playerIds)
         {
