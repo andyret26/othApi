@@ -11,6 +11,7 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.RateLimiting;
 using othApi.Services.Discord;
+using othApi.Services.InfoExtractor;
 
 
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IOsuApiService, OsuApiService>();
 builder.Services.AddScoped<IDiscordService, DiscordService>();
 builder.Services.AddSingleton(new DiscordSocketClient());
+builder.Services.AddSingleton<IInfoExtractor, InfoExtractor>();
 
 builder.Services.AddCors();
 

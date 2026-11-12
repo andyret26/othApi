@@ -1,9 +1,12 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using othApi.Data;
 using othApi.Data.Dtos;
+using othApi.Data.Entities;
 using othApi.Data.Exceptions;
 using othApi.Services.Discord;
+using othApi.Services.InfoExtractor;
 using othApi.Services.OsuApi;
 using othApi.Services.Players;
 using othApi.Utils;
@@ -14,11 +17,12 @@ namespace othApi.Controllers;
 [Consumes("application/Json")]
 [Produces("application/Json")]
 [EnableRateLimiting("fixed")]
-public class MiscController(IOsuApiService osuApiService, IPlayerService playerService, IDiscordService discordService) : ControllerBase
+public class MiscController(IOsuApiService osuApiService, IPlayerService playerService, IDiscordService discordService, IInfoExtractor infoExtractor) : ControllerBase
 {
     private readonly IOsuApiService _osuApiService = osuApiService;
     private readonly IPlayerService _playerService = playerService;
     private readonly IDiscordService _discordService = discordService;
+    private readonly IInfoExtractor _infoExtractor = infoExtractor;
 
     [HttpPost("compare-matches-v2")]
     [ProducesResponseType(200)]
@@ -83,5 +87,26 @@ public class MiscController(IOsuApiService osuApiService, IPlayerService playerS
     public async Task<IActionResult> PingDiscord(){
         await _discordService.SendMessage($"pinged from OTH server");
         return Ok();
+    }
+
+    [HttpPost("get-tournament-info")]
+    [ProducesResponseType(200)]
+    public async Task<IActionResult> GetTournamentInfo([FromBody] ForumPostUrl url)
+    {   
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+
+        Console.WriteLine($"Received request to extract tournament info from URL: {url.Url}");
+        var text = await _infoExtractor.GetTournamentText(url.Url);
+        var response = await _infoExtractor.ExtractTournamentInfo(text);
+        // Console.WriteLine($"\n\n\n {text} \n\n\n");
+
+
+        stopwatch.Stop();
+        TimeSpan ts = stopwatch.Elapsed;
+        Console.WriteLine($"Time Elapsed: {ts.TotalMilliseconds} ms");
+
+        return Ok(response);
     }
 }
