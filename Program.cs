@@ -15,6 +15,10 @@ using othApi.Services.Discord;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddEnvironmentVariables();
+
 var config = builder.Configuration;
 
 

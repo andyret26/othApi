@@ -1,0 +1,35 @@
+services:
+  othapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:5110:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DB_CONNECTION=Host=db;Port=5434;Database=othdb;Username=postgres;Password=postgrespassword
+    volumes:
+      - ./secrets.json:/app/secrets.json
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:latest
+    command: -p 5434
+    ports:
+      - "127.0.0.1:5434:5434"
+    environment:
+      POSTGRES_DB: othdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -p 5434"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:

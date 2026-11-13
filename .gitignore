@@ -26,3 +26,5 @@
 *.env
 out
 creds.json
+/secrets/secrets.json
+/secrets.json
