@@ -20,4 +20,5 @@ public class Tournament
     public Player AddedBy { get; set; } = null!; // Add this property
     public int AddedById { get; set; } = 3191010;// Add this property
 
+    public bool IsDeleted { get; set; } = false;
 }

@@ -15,8 +15,13 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
 
     public async Task<Tournament?> Delete(int id)
     {
-        await _db.Tournaments.Where((t) => t.Id == id).ExecuteDeleteAsync();
-        await _db.SaveChangesAsync();
+        var tournament = await _db.Tournaments.SingleOrDefaultAsync((t) => t.Id == id && !t.IsDeleted);
+        if (tournament != null)
+        {
+            tournament.IsDeleted = true;
+            await _db.SaveChangesAsync();
+            return tournament;
+        }
         return null;
     }
 
@@ -24,7 +29,10 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
     {
         try
         {
-            var tournaments = await _db.Tournaments.Include((t) => t.TeamMates).ToListAsync();
+            var tournaments = await _db.Tournaments
+                .Include((t) => t.TeamMates)
+                .Where(t => !t.IsDeleted)
+                .ToListAsync();
             return tournaments;
         }
         catch (Exception err)
@@ -37,7 +45,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
     {
         try
         {
-            var tournament = await _db.Tournaments.Include(t => t.TeamMates).SingleOrDefaultAsync((t) => t.Id == id);
+            var tournament = await _db.Tournaments.Include(t => t.TeamMates).SingleOrDefaultAsync((t) => t.Id == id && !t.IsDeleted);
             return tournament;
         }
         catch (Exception err)
@@ -134,7 +142,7 @@ public class TournamentService(DataContext db, IMapper mapper, IOsuApiService os
     {
         var tournaments = await _db.Tournaments
             .Include((t) => t.TeamMates)
-            .Where((t) => t.TeamMates!.Any((p) => p.Id == playerId))
+            .Where((t) => !t.IsDeleted && t.TeamMates!.Any((p) => p.Id == playerId))
             .OrderByDescending((t) => t.Date)
             .ToListAsync();
         return tournaments;
