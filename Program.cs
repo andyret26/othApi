@@ -122,6 +122,12 @@ builder.Services.AddRateLimiter(_ => _
 
 // ####### APP ##############################################################################################
 var app = builder.Build();
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 var discordClient = app.Services.GetService<DiscordSocketClient>();
 discordClient!.LoginAsync(TokenType.Bot, config["DISCORD_BOT_TOKEN"]).GetAwaiter().GetResult();
 discordClient.StartAsync().GetAwaiter().GetResult();

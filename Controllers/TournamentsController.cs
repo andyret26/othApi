@@ -112,9 +112,9 @@ namespace othApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PutTournament(int id, [FromBody] TournamentPutDto tournamentDto)
         {
-            var authSub = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            _logger.LogInformation("User with id {id} is trying to update tournament with id {tournamentId}", authSub.Split("|")[2], id);
-            if (authSub.Split("|")[2] != tournamentDto.AddedById.ToString())
+            var userId = GetAuthenticatedUserId();
+            _logger.LogInformation("User with id {id} is trying to update tournament with id {tournamentId}", userId, id);
+            if (userId != tournamentDto.AddedById.ToString())
             {
                 return Unauthorized(new { message = "Faild to authorize Update" });
             }
@@ -157,5 +157,39 @@ namespace othApi.Controllers
             return tournamentDtos;
 
         }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        [EnableRateLimiting("fixed")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult> DeleteTournament(int id)
+        {
+            var userId = GetAuthenticatedUserId();
+            _logger.LogInformation("User with id {id} is trying to delete tournament with id {tournamentId}", userId, id);
+
+            var tournament = await _tournamentService.GetById(id);
+            if (tournament == null)
+            {
+                return NotFound(new { title = "NotFound", status = "404", detail = "Tournament not found." });
+            }
+
+            if (tournament.AddedById.ToString() != userId)
+            {
+                return Forbid();
+            }
+
+            var deletedTournament = await _tournamentService.Delete(id);
+            if (deletedTournament == null)
+            {
+                return NotFound(new { title = "NotFound", status = "404", detail = "Tournament not found." });
+            }
+            return NoContent();
+        }
+
+        private string GetAuthenticatedUserId() =>
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value.Split("|")[2];
     }
 }
